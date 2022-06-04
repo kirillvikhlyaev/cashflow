@@ -21,13 +21,15 @@ class SlipAdapter extends TypeAdapter<Slip> {
       cost: fields[1] as int,
       type: fields[2] as String,
       date: fields[3] as DateTime,
+      startSlipDate: fields[4] as DateTime,
+      isEnabledNotification: fields[5] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, Slip obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -35,7 +37,11 @@ class SlipAdapter extends TypeAdapter<Slip> {
       ..writeByte(2)
       ..write(obj.type)
       ..writeByte(3)
-      ..write(obj.date);
+      ..write(obj.date)
+      ..writeByte(4)
+      ..write(obj.startSlipDate)
+      ..writeByte(5)
+      ..write(obj.isEnabledNotification);
   }
 
   @override

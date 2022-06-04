@@ -31,7 +31,7 @@ class SettingsWidget extends StatelessWidget {
         child: Center(
             child: OutlinedButton(
           child: Text('Сменить тему', style: Theme.of(context).textTheme.bodyText1),
-          onPressed: () => Get.changeTheme(Get.isDarkMode ? ThemeData.light() : ThemeData.dark()),
+          onPressed: () => Get.changeThemeMode(Get.isDarkMode ? ThemeMode.light : ThemeMode.dark),
           style: Theme.of(context).outlinedButtonTheme.style
           ),
         ),

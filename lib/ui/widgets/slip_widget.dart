@@ -84,7 +84,9 @@ class _SlipWidgetState extends State<SlipWidget> with RestorationMixin {
         name: nameController.text,
         cost: int.parse(costController.text),
         type: _typeOfSlip == TypeOfSlip.once ? 'Единоразовый' : 'Ежемесячный',
-        date: slipDate);
+        date: slipDate,
+        startSlipDate: DateTime.now(),
+        isEnabledNotification: true);
     c.slips.add(slip); 
     var box = Hive.box<Slip>('slips');
     box.add(slip);

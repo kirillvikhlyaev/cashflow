@@ -22,7 +22,7 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         actions: [IconButton(onPressed: () {
           Get.toNamed('/settings');
-        }, icon: const Icon(Icons.settings))],
+        }, icon: const Icon(Icons.settings_outlined,))],
       ),
       body: MainWidget(),
     );

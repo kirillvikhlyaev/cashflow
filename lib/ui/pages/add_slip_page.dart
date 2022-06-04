@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_get_x/ui/widgets/slip_widget.dart';
+import 'package:get/get.dart';
 
 class AddSlipPage extends StatelessWidget {
   const AddSlipPage({Key? key}) : super(key: key);
@@ -18,10 +19,12 @@ class AddSlipPage extends StatelessWidget {
           ],
         ),
       ),
-      body: ColoredBox(
+      body: Container(
         color: Theme.of(context).backgroundColor,
-        child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
+        width: Get.width,
+        height: Get.height,
+        child: const SingleChildScrollView(
+            padding:  EdgeInsets.all(16.0),
             child: SlipWidget(
               restorationId: 'add_new_slip',
             )),

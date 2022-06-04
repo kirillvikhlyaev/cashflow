@@ -9,12 +9,7 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final Controller c = Get.put(Controller());
 
-    Future.delayed(const Duration(seconds: 1), () async {
-      
-
-    }).then((_) => Get.offAndToNamed('/main'));
-
-
+    Future.delayed(const Duration(seconds: 1), () async {}).then((_) => Get.offAndToNamed('/main'));
 
     return Scaffold(
       body: ColoredBox(

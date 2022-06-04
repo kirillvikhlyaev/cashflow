@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
       title: Strings.title,
       theme: CustomThemData.getLightTheme(),
       darkTheme: CustomThemData.getDarkTheme(),
-      themeMode: ThemeMode.dark,
+      themeMode: ThemeMode.light,
       initialRoute: '/',
       getPages: [
         GetPage(name: '/', page: () => const SplashScreen()),
@@ -58,10 +58,10 @@ class CustomThemData {
         colorScheme: const ColorScheme.light(
             brightness: Brightness.light, secondary: Colors.indigoAccent),
         appBarTheme: const AppBarTheme(
-            iconTheme: IconThemeData(color: Colors.black),
+            iconTheme: IconThemeData(color: Colors.grey),
             color: Colors.white,
             titleTextStyle: TextStyle(color: Colors.black)),
-        backgroundColor: const Color.fromARGB(255, 170, 170, 170),
+        backgroundColor: const Color.fromARGB(255, 213, 213, 213),
         listTileTheme: const ListTileThemeData(
           tileColor: Colors.white,
         ),
@@ -73,8 +73,10 @@ class CustomThemData {
           headline1: TextStyle(
               color: Colors.green, fontSize: 21, fontWeight: FontWeight.bold),
           headline2: TextStyle(color: Colors.grey, fontSize: 14),
+          headline3:  TextStyle(fontSize: 16, color: Colors.black),
+          headline4: TextStyle(color: Colors.black, fontSize: 32),
         ),
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.grey),
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: ButtonStyle(
             shape: MaterialStateProperty.all(RoundedRectangleBorder(
@@ -111,7 +113,7 @@ class CustomThemData {
         listTileTheme: const ListTileThemeData(
           tileColor: AppColors.lightBgColor,
         ),
-        textTheme: const TextTheme(
+        textTheme:  TextTheme(
           bodyText1: TextStyle(
               color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
           bodyText2: TextStyle(
@@ -119,6 +121,8 @@ class CustomThemData {
           headline1: TextStyle(
               color: Colors.green, fontSize: 21, fontWeight: FontWeight.bold),
           headline2: TextStyle(color: Colors.grey, fontSize: 14),
+          headline3:  TextStyle(fontSize: 16, color: Colors.white),
+          headline4: TextStyle(color: Colors.white, fontSize: 32),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
         outlinedButtonTheme: OutlinedButtonThemeData(
