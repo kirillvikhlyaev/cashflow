@@ -7,3 +7,5 @@ Used packages:
 <li>path_provider</li>
 <li>date_format</li>
 </ul>
+<br>
+<p>Check screenshots in <b>/screenshots</b> folder 😇</p>
