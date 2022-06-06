@@ -1,25 +1,33 @@
 import 'dart:io';
 
+import 'package:cashflow/core/appcolors.dart';
+import 'package:cashflow/core/strings.dart';
+import 'package:cashflow/ui/pages/add_slip_page.dart';
+import 'package:cashflow/ui/pages/home_page.dart';
+import 'package:cashflow/ui/pages/settings_page.dart';
+import 'package:cashflow/ui/pages/splash_screen_page.dart';
+import 'package:cashflow/ui/pages/unknown_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_get_x/core/appcolors.dart';
-import 'package:flutter_get_x/core/strings.dart';
-import 'package:flutter_get_x/ui/pages/add_slip_page.dart';
-import 'package:flutter_get_x/ui/pages/home_page.dart';
-import 'package:flutter_get_x/ui/pages/settings_page.dart';
-import 'package:flutter_get_x/ui/pages/splash_screen_page.dart';
-import 'package:flutter_get_x/ui/pages/unknown_page.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:timezone/data/latest.dart' as tz;
 
+
+
+import 'controller/controller.dart';
 import 'model/slip.dart';
 
-void main() async {
+void main() async {  
   WidgetsFlutterBinding.ensureInitialized();
   Directory appDocDir = await getApplicationDocumentsDirectory();
+  tz.initializeTimeZones();
   Hive.init(appDocDir.path);
   Hive.registerAdapter(SlipAdapter());
-  await Hive.openBox<Slip>('slips');
+  var box = await Hive.openBox<Slip>('slips');
+
+    Controller c = Get.put(Controller());
+    c.slips.addAll(box.values);
   runApp(const MyApp());
 }
 
@@ -113,7 +121,7 @@ class CustomThemData {
         listTileTheme: const ListTileThemeData(
           tileColor: AppColors.lightBgColor,
         ),
-        textTheme:  TextTheme(
+        textTheme:  const TextTheme(
           bodyText1: TextStyle(
               color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
           bodyText2: TextStyle(

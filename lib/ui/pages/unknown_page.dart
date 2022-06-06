@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_get_x/core/appcolors.dart';
 
 class UnknownPage extends StatelessWidget {
   const UnknownPage({Key? key}) : super(key: key);

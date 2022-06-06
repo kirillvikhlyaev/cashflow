@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_get_x/controller/controller.dart';
+import 'package:cashflow/controller/controller.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 class SplashScreen extends StatelessWidget {

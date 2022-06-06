@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_get_x/core/appcolors.dart';
-import 'package:flutter_get_x/ui/widgets/main_widget.dart';
+import 'package:cashflow/ui/widgets/main_widget.dart';
 import 'package:get/get.dart';
 
 class HomePage extends StatefulWidget {

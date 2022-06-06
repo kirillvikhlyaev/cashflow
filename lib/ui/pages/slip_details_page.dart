@@ -1,7 +1,10 @@
 import 'dart:developer';
 
+import 'package:cashflow/controller/controller.dart';
+import 'package:cashflow/core/notification_handler.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_get_x/core/dateformatter.dart';
+import 'package:cashflow/core/dateformatter.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 
 import '../../model/slip.dart';
@@ -16,6 +19,9 @@ class SlipDetails extends StatefulWidget {
 
 class _SlipDetailsState extends State<SlipDetails> {
   bool isEnabledNotification = false;
+  FlutterLocalNotificationsPlugin flp = FlutterLocalNotificationsPlugin();
+  Controller c = Get.put(Controller());
+
   @override
   void initState() {
     isEnabledNotification = widget.slip.isEnabledNotification;
@@ -52,7 +58,7 @@ class _SlipDetailsState extends State<SlipDetails> {
                       Text(widget.slip.name,
                           style: Theme.of(context).textTheme.headline4),
                       const SizedBox(height: 8),
-                      Divider(),
+                      const Divider(),
                       const SizedBox(height: 8),
                        RichText(
                         text: TextSpan(children: [
@@ -164,7 +170,11 @@ class _SlipDetailsState extends State<SlipDetails> {
                           widget.slip.isEnabledNotification =
                               isEnabledNotification;
                           await widget.slip.save();
-                          log(widget.slip.toString());
+
+                          value == false ? await flp.cancel(c.slips.indexOf(widget.slip)) : 
+                          NotificationHandler.showScheduledNotification(id: c.slips.indexOf(widget.slip), title: widget.slip.name, body: 'Завтра ожидается оплата в размере ${widget.slip.cost}₽', payload: 'Cashflow', scheduledDate: widget.slip.date.add(const Duration(hours: -4)));
+
+                          log(widget.slip.toString() + ' - индекс элемента/уведомления - ${c.slips.indexOf(widget.slip)}');
                         })
                   ],
                 ),

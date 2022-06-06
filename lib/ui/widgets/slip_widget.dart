@@ -1,13 +1,17 @@
 import 'dart:developer';
 
+import 'package:cashflow/core/notification_handler.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_get_x/controller/controller.dart';
-import 'package:flutter_get_x/core/appcolors.dart';
-import 'package:flutter_get_x/model/slip.dart';
+import 'package:cashflow/controller/controller.dart';
+import 'package:cashflow/core/appcolors.dart';
+import 'package:cashflow/model/slip.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
 enum TypeOfSlip { once, mountly }
+
+final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
 class SlipWidget extends StatefulWidget {
   const SlipWidget({Key? key, required this.restorationId}) : super(key: key);
@@ -21,7 +25,7 @@ class _SlipWidgetState extends State<SlipWidget> with RestorationMixin {
   TextEditingController costController = TextEditingController();
   TypeOfSlip? _typeOfSlip = TypeOfSlip.once;
   DateTime slipDate = DateTime.now();
-  final Controller c = Get.put(Controller()); 
+  final Controller c = Get.put(Controller());
 
   @override
   String? get restorationId => widget.restorationId;
@@ -80,6 +84,7 @@ class _SlipWidgetState extends State<SlipWidget> with RestorationMixin {
   }
 
   void submitForm() {
+    if (_formKey.currentState!.validate() ) {
     Slip slip = Slip(
         name: nameController.text,
         cost: int.parse(costController.text),
@@ -87,92 +92,122 @@ class _SlipWidgetState extends State<SlipWidget> with RestorationMixin {
         date: slipDate,
         startSlipDate: DateTime.now(),
         isEnabledNotification: true);
-    c.slips.add(slip); 
+    c.slips.add(slip);
+    NotificationHandler.showScheduledNotification(
+        id: c.slips.indexOf(slip),
+        title: slip.name,
+        body: 'Завтра ожидается оплата в размере ${slip.cost}₽',
+        payload: 'Cashflow',
+        scheduledDate: slipDate.add(const Duration(hours: -4)));
+    log('Добавление под индексом ${c.slips.indexOf(slip)}');
     var box = Hive.box<Slip>('slips');
     box.add(slip);
-    log(box.getAt(0).toString() + ' -- из коробки');
     Get.back();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextField(
-          decoration: InputDecoration(
-            border: Theme.of(context).inputDecorationTheme.border,
-            enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
-            focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
-            labelStyle: Theme.of(context).inputDecorationTheme.labelStyle,
-            labelText: 'Название платежа',
-            filled: Theme.of(context).inputDecorationTheme.filled,
-            fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          TextFormField(
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Введите название платежа';
+              }
+              return null;
+            },
+            decoration: InputDecoration(
+              border: Theme.of(context).inputDecorationTheme.border,
+              enabledBorder:
+                  Theme.of(context).inputDecorationTheme.enabledBorder,
+              focusedBorder:
+                  Theme.of(context).inputDecorationTheme.focusedBorder,
+              labelStyle: Theme.of(context).inputDecorationTheme.labelStyle,
+              labelText: 'Название платежа',
+              filled: Theme.of(context).inputDecorationTheme.filled,
+              fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+            ),
+            controller: nameController,
+            maxLines: 1,
           ),
-          controller: nameController,
-          maxLines: 1,
-        ),
-        const SizedBox(height: 10),
-        ListTile(
-          leading: Radio(
-              value: TypeOfSlip.once,
-              groupValue: _typeOfSlip,
-              onChanged: (TypeOfSlip? value) {
-                setState(() {
-                  _typeOfSlip = value;
-                });
-              }),
-          title: Text('Один раз',
-              style: Theme.of(context).textTheme.bodyText1),
-        ),
-        ListTile(
-          leading: Radio(
-              value: TypeOfSlip.mountly,
-              groupValue: _typeOfSlip,
-              onChanged: (TypeOfSlip? value) {
-                setState(() {
-                  _typeOfSlip = value;
-                });
-              }),
-          title: Text('Ежемесячно',
-              style: Theme.of(context).textTheme.bodyText1),
-        ),
-        const SizedBox(height: 10),
-        OutlinedButton(
-          onPressed: () {
-            _restorableDatePickerRouteFuture.present();
-          },
-          child: Text('Выбрать дату',
-              style: Theme.of(context).textTheme.bodyText1),
-          style: Theme.of(context).outlinedButtonTheme.style
-        ),
-        const SizedBox(height: 10),
-        TextField(
-          decoration: InputDecoration(
-            border: Theme.of(context).inputDecorationTheme.border,
-            enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
-            focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
-            labelStyle: Theme.of(context).inputDecorationTheme.labelStyle,
-            labelText: 'Сколько нужно заплатить?',
-            filled: Theme.of(context).inputDecorationTheme.filled,
-            fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+          const SizedBox(height: 10),
+          ListTile(
+            leading: Radio(
+                activeColor: Theme.of(context).colorScheme.secondary,
+                value: TypeOfSlip.once,
+                groupValue: _typeOfSlip,
+                onChanged: (TypeOfSlip? value) {
+                  setState(() {
+                    _typeOfSlip = value;
+                  });
+                }),
+            title:
+                Text('Один раз', style: Theme.of(context).textTheme.bodyText1),
           ),
-          controller: costController,
-          maxLines: 1,
-        ),
-        const SizedBox(height: 20),
-        OutlinedButton(
-          onPressed: submitForm,
-          child: Text('Готово',
-              style: Theme.of(context).textTheme.bodyText2),
-          style: ButtonStyle(
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25.0))),
-              backgroundColor: MaterialStateProperty.all(
-                  Theme.of(context).colorScheme.secondary),
-              minimumSize: MaterialStateProperty.all(Size(Get.width, 45)),
-              overlayColor: MaterialStateProperty.all(AppColors.overlayColor)),
-        ),
-      ],
+          ListTile(
+            leading: Radio(
+                activeColor: Theme.of(context).colorScheme.secondary,
+                value: TypeOfSlip.mountly,
+                groupValue: _typeOfSlip,
+                onChanged: (TypeOfSlip? value) {
+                  setState(() {
+                    _typeOfSlip = value;
+                  });
+                }),
+            title: Text('Ежемесячно',
+                style: Theme.of(context).textTheme.bodyText1),
+          ),
+          const SizedBox(height: 10),
+          OutlinedButton(
+              onPressed: () {
+                _restorableDatePickerRouteFuture.present();
+              },
+              child: Text('Выбрать дату',
+                  style: Theme.of(context).textTheme.bodyText1),
+              style: Theme.of(context).outlinedButtonTheme.style),
+          const SizedBox(height: 10),
+          TextFormField(
+
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Введите стоимость платежа';
+              }
+              return null;
+            },
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            decoration: InputDecoration(
+              border: Theme.of(context).inputDecorationTheme.border,
+              enabledBorder:
+                  Theme.of(context).inputDecorationTheme.enabledBorder,
+              focusedBorder:
+                  Theme.of(context).inputDecorationTheme.focusedBorder,
+              labelStyle: Theme.of(context).inputDecorationTheme.labelStyle,
+              labelText: 'Сколько нужно заплатить?',
+              filled: Theme.of(context).inputDecorationTheme.filled,
+              fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+            ),
+            controller: costController,
+            maxLines: 1,
+          ),
+          const SizedBox(height: 20),
+          OutlinedButton(
+            onPressed: submitForm,
+            child: Text('Готово', style: Theme.of(context).textTheme.bodyText2),
+            style: ButtonStyle(
+                shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25.0))),
+                backgroundColor: MaterialStateProperty.all(
+                    Theme.of(context).colorScheme.secondary),
+                minimumSize: MaterialStateProperty.all(Size(Get.width, 45)),
+                overlayColor:
+                    MaterialStateProperty.all(AppColors.overlayColor)),
+          ),
+        ],
+      ),
     );
   }
 }

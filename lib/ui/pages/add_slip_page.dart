@@ -1,5 +1,5 @@
+import 'package:cashflow/ui/widgets/slip_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_get_x/ui/widgets/slip_widget.dart';
 import 'package:get/get.dart';
 
 class AddSlipPage extends StatelessWidget {

@@ -1,19 +1,36 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_get_x/controller/controller.dart';
-import 'package:flutter_get_x/core/appcolors.dart';
-import 'package:flutter_get_x/core/dateformatter.dart';
-import 'package:flutter_get_x/model/slip.dart';
-import 'package:flutter_get_x/ui/pages/slip_details_page.dart';
+import 'package:cashflow/controller/controller.dart';
+import 'package:cashflow/core/appcolors.dart';
+import 'package:cashflow/core/dateformatter.dart';
+import 'package:cashflow/core/notification_handler.dart';
+import 'package:cashflow/model/slip.dart';
+import 'package:cashflow/ui/pages/slip_details_page.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-class MainWidget extends StatelessWidget {
+class MainWidget extends StatefulWidget {
   const MainWidget({Key? key}) : super(key: key);
+
+  @override
+  State<MainWidget> createState() => _MainWidgetState();
+}
+
+class _MainWidgetState extends State<MainWidget> {
+  @override
+  void initState() {
+    NotificationHandler.init(isSheduled: true);
+    listenNotification();
+    super.initState();
+  }
+
+  
+  void listenNotification() => NotificationHandler.onNotification;
 
   @override
   Widget build(BuildContext context) {
     Box<Slip> box = Hive.box('slips');
-
     void addSlip() {
       Get.toNamed('/addslip');
     }
@@ -31,7 +48,6 @@ class MainWidget extends StatelessWidget {
               style: Theme.of(context).outlinedButtonTheme.style,
             ),
             const Divider(),
-    
             Expanded(
               child: ValueListenableBuilder(valueListenable: box.listenable(), builder: (context, Box<Slip> slipBox, _) {
                 return ListView.separated(
@@ -55,6 +71,7 @@ class CustomListTile extends StatelessWidget {
       : super(key: key);
 
   final Controller c = Get.put(Controller());
+  
   Box<Slip> box = Hive.box('slips');
 
   void onDeleteTap() {
@@ -72,6 +89,7 @@ class CustomListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log('Count: ${c.slips.length}');
     return InkWell(
       onTap: () => Get.to(SlipDetails(slip: slip)),
       child: Container(
