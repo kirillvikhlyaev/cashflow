@@ -60,7 +60,7 @@ class _SlipDetailsState extends State<SlipDetails> {
                       const SizedBox(height: 8),
                       const Divider(),
                       const SizedBox(height: 8),
-                       RichText(
+                      RichText(
                         text: TextSpan(children: [
                           TextSpan(
                               text: widget.slip.type,
@@ -171,10 +171,31 @@ class _SlipDetailsState extends State<SlipDetails> {
                               isEnabledNotification;
                           await widget.slip.save();
 
-                          value == false ? await flp.cancel(c.slips.indexOf(widget.slip)) : 
-                          NotificationHandler.showScheduledNotification(id: c.slips.indexOf(widget.slip), title: widget.slip.name, body: 'Завтра ожидается оплата в размере ${widget.slip.cost}₽', payload: 'Cashflow', scheduledDate: widget.slip.date.add(const Duration(hours: -4)));
+                          if (value) {
+                            widget.slip.type == 'Единоразовый'
+                                ? NotificationHandler
+                                    .showOnceScheduledNotification(
+                                    id: c.slips.indexOf(widget.slip),
+                                    title: widget.slip.name,
+                                    body:
+                                        'Завтра ожидается оплата в размере ${widget.slip.cost}₽',
+                                    payload: 'Cashflow',
+                                    requiredDate: widget.slip.date,
+                                  )
+                                : NotificationHandler
+                                    .scheduleMonthlyTenAMNotification(
+                                    id: c.slips.indexOf(widget.slip),
+                                    title: widget.slip.name,
+                                    body: 'Завтра ожидается оплата в размере ${widget.slip.cost}₽',
+                                    payload: 'Cashflow',
+                                    requiredDate: widget.slip.date,
+                                  );
+                          } else {
+                            await flp.cancel(c.slips.indexOf(widget.slip));
+                          }
 
-                          log(widget.slip.toString() + ' - индекс элемента/уведомления - ${c.slips.indexOf(widget.slip)}');
+                          log(widget.slip.toString() +
+                              ' - индекс элемента/уведомления - ${c.slips.indexOf(widget.slip)}');
                         })
                   ],
                 ),

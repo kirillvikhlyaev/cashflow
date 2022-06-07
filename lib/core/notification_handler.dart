@@ -28,27 +28,67 @@ class NotificationHandler {
       onSelectNotification: (payload) async {
         onNotification.add(payload);
         if (payload != null) {
-      log('notification payload: $payload');
-    }
+          log('notification payload: $payload');
+        }
       },
     );
   }
 
-  static Future showScheduledNotification({
+  static Future showOnceScheduledNotification({
     required int id,
     required String? title,
     required String? body,
     required String? payload,
-    required DateTime scheduledDate,
-  }) async =>
-      _notifications.zonedSchedule(
+    required DateTime requiredDate,
+  }) async {
+    final tz.TZDateTime now = tz.TZDateTime.from(requiredDate, tz.local);
+
+    tz.TZDateTime scheduledDate =
+        tz.TZDateTime(tz.local, now.year, now.month, now.day - 1, 10);
+
+    _notifications.zonedSchedule(
+      id,
+      title,
+      body,
+      scheduledDate,
+      await _notificationDetails(),
+      payload: payload,
+      androidAllowWhileIdle: true,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+    );
+  }
+
+  static Future<void> scheduleMonthlyTenAMNotification({
+    required int id,
+    required String? title,
+    required String? body,
+    required String? payload,
+    required DateTime requiredDate,
+  }) async {
+    await _notifications.zonedSchedule(
         id,
         title,
         body,
-        tz.TZDateTime.from(scheduledDate, tz.local),
-        await _notificationDetails(),
-        payload: payload,
+        _nextInstanceOfTenAM(requiredDate),
+        const NotificationDetails(
+          android: AndroidNotificationDetails('monthly notification channel id',
+              'monthly notification channel name'),
+        ),
         androidAllowWhileIdle: true,
-        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-      );
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.dayOfMonthAndTime);
+  }
+
+  static tz.TZDateTime _nextInstanceOfTenAM(DateTime requiredMonth) {
+    final tz.TZDateTime now = tz.TZDateTime.from(requiredMonth, tz.local);
+    tz.TZDateTime scheduledDate =
+        tz.TZDateTime(tz.local, now.year, now.month, now.day - 1, 10);
+    if (scheduledDate.isBefore(now)) {
+      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    }
+    log('$scheduledDate');
+    return scheduledDate;
+  }
 }

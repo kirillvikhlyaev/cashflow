@@ -84,25 +84,37 @@ class _SlipWidgetState extends State<SlipWidget> with RestorationMixin {
   }
 
   void submitForm() {
-    if (_formKey.currentState!.validate() ) {
-    Slip slip = Slip(
-        name: nameController.text,
-        cost: int.parse(costController.text),
-        type: _typeOfSlip == TypeOfSlip.once ? 'Единоразовый' : 'Ежемесячный',
-        date: slipDate,
-        startSlipDate: DateTime.now(),
-        isEnabledNotification: true);
-    c.slips.add(slip);
-    NotificationHandler.showScheduledNotification(
-        id: c.slips.indexOf(slip),
-        title: slip.name,
-        body: 'Завтра ожидается оплата в размере ${slip.cost}₽',
-        payload: 'Cashflow',
-        scheduledDate: slipDate.add(const Duration(hours: -4)));
-    log('Добавление под индексом ${c.slips.indexOf(slip)}');
-    var box = Hive.box<Slip>('slips');
-    box.add(slip);
-    Get.back();
+    if (_formKey.currentState!.validate()) {
+      Slip slip = Slip(
+          name: nameController.text,
+          cost: int.parse(costController.text),
+          type: _typeOfSlip == TypeOfSlip.once ? 'Единоразовый' : 'Ежемесячный',
+          date: slipDate,
+          startSlipDate: DateTime.now(),
+          isEnabledNotification: true);
+
+      c.slips.add(slip);
+      if (_typeOfSlip == TypeOfSlip.once) {
+        NotificationHandler.showOnceScheduledNotification(
+            id: c.slips.indexOf(slip),
+            title: slip.name,
+            body: 'Завтра ожидается оплата в размере ${slip.cost}₽',
+            payload: 'Cashflow',
+            requiredDate: slipDate);
+      } else {
+        NotificationHandler.scheduleMonthlyTenAMNotification(
+          id: c.slips.indexOf(slip),
+          title: slip.name,
+          body: 'Завтра ожидается оплата в размере ${slip.cost}₽',
+          payload: 'Cashflow',
+          requiredDate: slipDate,
+        );
+      }
+      log('Добавление под индексом ${c.slips.indexOf(slip)}');
+
+      var box = Hive.box<Slip>('slips');
+      box.add(slip);
+      Get.back();
     }
   }
 
@@ -170,7 +182,6 @@ class _SlipWidgetState extends State<SlipWidget> with RestorationMixin {
               style: Theme.of(context).outlinedButtonTheme.style),
           const SizedBox(height: 10),
           TextFormField(
-
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Введите стоимость платежа';
