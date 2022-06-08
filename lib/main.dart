@@ -1,20 +1,13 @@
 import 'dart:io';
-
 import 'package:cashflow/core/appcolors.dart';
-import 'package:cashflow/core/strings.dart';
 import 'package:cashflow/ui/pages/add_slip_page.dart';
 import 'package:cashflow/ui/pages/home_page.dart';
-import 'package:cashflow/ui/pages/settings_page.dart';
-import 'package:cashflow/ui/pages/splash_screen_page.dart';
 import 'package:cashflow/ui/pages/unknown_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:timezone/data/latest.dart' as tz;
-
-
-
 import 'controller/controller.dart';
 import 'model/slip.dart';
 
@@ -37,24 +30,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: Strings.title,
+      title: 'Управление подписками',
       theme: CustomThemData.getLightTheme(),
       darkTheme: CustomThemData.getDarkTheme(),
-      themeMode: ThemeMode.light,
-      initialRoute: '/',
+      themeMode: ThemeMode.system,
+      initialRoute: '/main',
       getPages: [
-        GetPage(name: '/', page: () => const SplashScreen()),
         GetPage(
-            name: '/main', page: () => const HomePage(title: Strings.title)),
+            name: '/main', page: () => const HomePage(title: 'Управление подписками')),
         GetPage(
             name: '/addslip',
             page: () => const AddSlipPage(),
             transition: Transition.zoom),
         GetPage(name: '/unknown', page: () => const UnknownPage()),
-        GetPage(
-            name: '/settings',
-            page: () => const SettingsPage(),
-            transition: Transition.downToUp)
       ],
     );
   }
